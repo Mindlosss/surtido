@@ -1218,7 +1218,6 @@
         function exportarResumen(tipo) {
             const resumen = [];
 
-            // Recopilar datos del resumen del modal
             const rows = modalResumenContent.querySelectorAll('tr');
             rows.forEach(row => {
                 const cells = row.querySelectorAll('td');
@@ -1232,12 +1231,25 @@
                 }
             });
 
+            // Mostrar alerta de carga
+            Swal.fire({
+                title: 'Generando archivo...',
+                text: `Por favor espera mientras se genera el ${tipo.toUpperCase()}.`,
+                icon: 'info',
+                allowOutsideClick: false,
+                showConfirmButton: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                },
+                background: '#2d3748',
+                color: '#cbd5e0'
+            });
+
             fetch('/gestor/exportar-resumen', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute(
-                            'content')
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
                     },
                     body: JSON.stringify({
                         resumen: resumen,
@@ -1248,16 +1260,18 @@
                 })
                 .then(response => response.blob())
                 .then(blob => {
+                    Swal.close(); 
+
                     const url = window.URL.createObjectURL(new Blob([blob]));
                     const link = document.createElement('a');
                     link.href = url;
-                    link.setAttribute('download', tipo === 'excel' ? 'resumen_inventario.xlsx' :
-                        'resumen_inventario.pdf');
+                    link.setAttribute('download', tipo === 'excel' ? 'resumen_inventario.xlsx' : 'resumen_inventario.pdf');
                     document.body.appendChild(link);
                     link.click();
                     link.parentNode.removeChild(link);
                 })
                 .catch(error => {
+                    Swal.close(); 
                     console.error('Error al exportar el resumen:', error);
                     Swal.fire({
                         title: 'Error',
