@@ -9,6 +9,10 @@ class SoporteController extends Controller
 {
     public function index()
     {
-        return view('soporte');
+        if (auth()->user()->hasRole('admin')) {
+            return view('soporte.admin');
+        }
+        return view('soporte.user');
     }
+    
 }
