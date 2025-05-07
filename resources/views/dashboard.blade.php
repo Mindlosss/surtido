@@ -2,7 +2,7 @@
     <x-slot name="header">
         <div class="flex items-center justify-between">
             <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-200 leading-tight">
-                Apps
+                APPS
             </h2>
             <!-- Alerta de precios libres (solo para usuarios con permiso) -->
             <div id="preciosAlert" class="{{ $showAlert ?? false ? 'block' : 'hidden' }}">
