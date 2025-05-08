@@ -37,7 +37,7 @@
                                 ['name' => 'INVERSIONES', 'icon' => 'inversiones.png', 'route' => '#', 'perm' => 'ver-inversiones', 'dev' => true],
                                 ['name' => 'COTIZADOR', 'icon' => 'cotizador.png', 'route' => 'cotizador', 'perm' => 'ver-cotizador', 'dev' => false],
                                 ['name' => 'VENTAS', 'icon' => 'ventas.png', 'route' => '#', 'perm' => 'ver-ventas', 'dev' => true],
-                                ['name' => 'SOPORTE', 'icon' => 'soporte.png', 'route' => '#', 'perm' => 'ver-soporte', 'dev' => true],
+                                ['name' => 'SOPORTE', 'icon' => 'soporte.png', 'route' => 'soporte', 'perm' => 'ver-soporte', 'dev' => false],
                                 ['name' => 'ENVÍOS', 'icon' => 'envios.png', 'route' => '#', 'perm' => 'ver-envios', 'dev' => true],
                             ];
 
