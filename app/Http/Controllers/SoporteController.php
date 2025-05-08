@@ -29,7 +29,7 @@ class SoporteController extends Controller
         }
 
         $tickets = $query->orderBy('created_at','desc')->get();
-        $responsables = ['Alan','Maribel'];
+        $responsables = ['Alan','Maribel','Fer'];
 
         return view(
             auth()->user()->hasRole('admin')
