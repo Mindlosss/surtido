@@ -95,8 +95,10 @@ Route::middleware(['auth', 'can:ver-comparador'])->group(function () {
 });
 
 // RUTAS DE SOPORTE
-Route::middleware(['auth', 'can:ver-soporte'])->group(function () {
-    Route::get('/soporte', [SoporteController::class, 'index'])->name('soporte');
+Route::middleware(['auth','can:ver-soporte'])->group(function(){
+    Route::get('/soporte', [SoporteController::class,'index'])->name('soporte');
+    Route::post('/soporte/tickets', [SoporteController::class,'store'])->name('soporte.tickets.store');
+    Route::put('/soporte/tickets/{ticket}', [SoporteController::class,'update'])->name('soporte.tickets.update');
 });
 
 // RUTAS DE PERFIL
