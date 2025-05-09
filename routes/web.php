@@ -99,6 +99,7 @@ Route::middleware(['auth','can:ver-soporte'])->group(function(){
     Route::get('/soporte', [SoporteController::class,'index'])->name('soporte');
     Route::post('/soporte/tickets', [SoporteController::class,'store'])->name('soporte.tickets.store');
     Route::put('/soporte/tickets/{ticket}', [SoporteController::class,'update'])->name('soporte.tickets.update');
+    Route::get('/soporte/fetch', [SoporteController::class,'fetch'])->name('soporte.fetch');
 });
 
 // RUTAS DE PERFIL

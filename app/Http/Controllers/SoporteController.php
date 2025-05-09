@@ -56,18 +56,33 @@ class SoporteController extends Controller
 
     public function update(Request $request, Ticket $ticket)
     {
-        // **Solo admin puede actualizar estado/asignado**
+
         if (! auth()->user()->hasRole('admin')) {
             abort(403);
         }
 
         $data = $request->validate([
-          'estado'     => 'required|in:Abierto,En Progreso,Cerrado',
-          'asignado_a' => 'nullable|in:Alan,Maribel,Fer',
+            'estado' => 'sometimes|required|in:Abierto,En Progreso,Cerrado', 
+            'prioridad' => 'sometimes|required|in:Alta,Media,Baja',
+            'asignado_a' => 'sometimes|nullable|in:Alan,Maribel,Fer',
         ]);
 
         $ticket->update($data);
 
         return back()->with('success','Ticket actualizado');
+    }
+
+    public function fetch()
+    {
+        $tickets = Ticket::with('creador')
+                        ->orderBy('created_at','desc')
+                        ->get();
+
+        // Puedes filtrar también por user_id si no es admin:
+        if (! auth()->user()->hasRole('admin')) {
+            $tickets = $tickets->where('user_id', auth()->id());
+        }
+
+        return response()->json($tickets);
     }
 }
