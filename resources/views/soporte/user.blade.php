@@ -2,186 +2,281 @@
     <x-slot name="header">
         <div class="flex items-center justify-between">
             <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-200 leading-tight">Mis Tickets</h2>
-            <button id="btn-create" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow">Crear Ticket</button>
+            <button id="btn-create" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow flex items-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                </svg>
+                <span class="hidden sm:inline">Crear Ticket</span>
+            </button>
         </div>
     </x-slot>
 
-    <div class="py-7">
-        <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
-                <form method="GET" action="{{ route('soporte') }}" class="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6">
+    <div class="py-4 sm:py-7">
+        <div class="max-w-3xl mx-auto px-3 sm:px-6 lg:px-8">
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4 sm:p-6 dark:border-gray-700">
+
+                {{-- Filtros de búsqueda --}}
+                <form method="GET" action="{{ route('soporte') }}" class="flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-center mb-6">
                     <input
                         name="search"
                         value="{{ request('search') }}"
                         type="text"
                         placeholder="Buscar mis tickets..."
-                        class="w-full sm:w-64 bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 placeholder-gray-500 dark:placeholder-gray-400 px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4 sm:mb-0"/>
-                    <div class="flex space-x-2">
+                        class="w-full sm:w-64 bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 placeholder-gray-500 dark:placeholder-gray-400 px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                    <div class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
                         <select
                             name="status"
                             class="bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            <option value="">Todos</option>
+                            <option value="">Todos los estados</option>
                             <option value="Abierto"{{ request('status')=='Abierto'?' selected':'' }}>Abierto</option>
                             <option value="En Progreso"{{ request('status')=='En Progreso'?' selected':'' }}>En Progreso</option>
                             <option value="Cerrado"{{ request('status')=='Cerrado'?' selected':'' }}>Cerrado</option>
                         </select>
-                        <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg shadow">Filtrar</button>
-                        <a href="{{ route('soporte') }}" class="bg-gray-400 hover:bg-gray-500 text-white px-4 py-2 rounded-lg shadow">Limpiar</a>
+                        <div class="flex gap-2">
+                            <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg shadow w-full sm:w-auto">
+                                Filtrar
+                            </button>
+                            <a href="{{ route('soporte') }}" class="bg-gray-400 hover:bg-gray-500 text-white px-4 py-2 rounded-lg shadow w-full sm:w-auto text-center">
+                                Limpiar
+                            </a>
+                        </div>
                     </div>
                 </form>
 
-                <div class="overflow-x-auto">
-                    <table id="tickets-table" class="min-w-full table-auto dark:text-gray-200">
-                        <thead>
-                            <tr class="bg-gray-50 dark:bg-gray-700">
-                                <th class="px-4 py-2 border-b border-gray-200 dark:border-gray-600 text-left">ID</th>
-                                <th class="px-4 py-2 border-b border-gray-200 dark:border-gray-600 text-left">Asunto</th>
-                                <th class="px-4 py-2 border-b border-gray-200 dark:border-gray-600 text-left">Estado</th>
-                                <th class="px-4 py-2 border-b border-gray-200 dark:border-gray-600 text-left">Creado</th>
-                                <th class="px-4 py-2 border-b border-gray-200 dark:border-gray-600"></th>
+                {{-- Tabla de tickets --}}
+                <div class="overflow-x-auto rounded-lg border dark:border-gray-700">
+                    <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                        <thead class="bg-gray-50 dark:bg-gray-700">
+                            <tr>
+                                <th class="hidden sm:table-cell px-3 sm:px-4 py-3 text-left text-xs sm:text-sm font-medium text-gray-800 dark:text-gray-200 uppercase">ID</th>
+                                <th class="px-3 sm:px-4 py-3 text-left text-xs sm:text-sm font-medium text-gray-800 dark:text-gray-200 uppercase">Asunto</th>
+                                <th class="px-3 sm:px-4 py-3 text-left text-xs sm:text-sm font-medium text-gray-800 dark:text-gray-200 uppercase">Estado</th>
+                                <th class="hidden md:table-cell px-4 py-3 text-left text-sm font-medium text-gray-800 dark:text-gray-200 uppercase">Creado</th>
+                                <th class="px-3 sm:px-4 py-3 text-right text-xs sm:text-sm font-medium text-gray-800 dark:text-gray-200 uppercase">Acciones</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody class="divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-gray-800">
                             @foreach($tickets as $t)
-                                <tr class="hover:bg-gray-100 dark:hover:bg-gray-700">
-                                    <td class="px-4 py-2 border-b border-gray-200 dark:border-gray-600">{{ $t->id }}</td>
-                                    <td class="px-4 py-2 border-b border-gray-200 dark:border-gray-600">{{ $t->asunto }}</td>
-                                    <td class="px-4 py-2 border-b border-gray-200 dark:border-gray-600">{{ $t->estado }}</td>
-                                    <td class="px-4 py-2 border-b border-gray-200 dark:border-gray-600">{{ $t->created_at->format('Y-m-d') }}</td>
-                                    <td class="px-4 py-2 border-b border-gray-200 dark:border-gray-600 text-center">
-                                        <button type="button" class="text-blue-600 hover:underline btn-view" data-ticket='@json($t)'>Ver</button>
+                                <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                                    <td class="hidden sm:table-cell px-3 sm:px-4 py-3 whitespace-nowrap text-sm text-gray-800 dark:text-gray-200">{{ $t->id }}</td>
+                                    <td class="px-3 sm:px-4 py-3 max-w-[200px] truncate text-sm text-gray-800 dark:text-gray-200">{{ $t->asunto }}</td>
+                                    <td class="px-3 sm:px-4 py-3 whitespace-nowrap text-sm">
+                                        <span class="px-2 py-1 text-xs font-medium rounded-full 
+                                            {{ $t->estado === 'Abierto' ? 'bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100' :
+                                               ($t->estado === 'En Progreso' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-100' :
+                                               'bg-gray-100 text-gray-800 dark:bg-gray-600 dark:text-gray-100') }}">
+                                            {{ $t->estado }}
+                                        </span>
+                                    </td>
+                                    <td class="hidden md:table-cell px-4 py-3 text-sm text-gray-800 dark:text-gray-200">{{ $t->created_at->format('d/m/Y') }}</td>
+                                    <td class="px-3 sm:px-4 py-3 text-right text-sm">
+                                        <button type="button" class="text-blue-600 hover:text-blue-800 dark:hover:text-blue-400 transition-colors btn-view" data-ticket='@json($t)'>
+                                            <span class="hidden sm:inline">Ver</span>
+                                            <svg class="inline sm:hidden w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                            </svg>
+                                        </button>
                                     </td>
                                 </tr>
                             @endforeach
                             @if($tickets->isEmpty())
-                                <tr><td colspan="5" class="text-center py-4">No tienes tickets.</td></tr>
+                                <tr><td colspan="5" class="text-center py-4 text-gray-800 dark:text-gray-200">No se encontraron tickets.</td></tr>
                             @endif
                         </tbody>
                     </table>
                 </div>
-            </div>
-        </div>
 
-        <!-- Modal Crear Ticket -->
-        <div id="modal-create" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50" style="display:none;">
-            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg w-11/12 max-w-md p-6 relative">
-                <button data-close class="absolute top-3 right-3 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 text-2xl leading-none">&times;</button>
-                <h3 class="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-4">Crear Nuevo Ticket</h3>
-                <form method="POST" action="{{ route('soporte.tickets.store') }}" class="space-y-4">
-                    @csrf
-                    <div>
-                        <label class="block text-gray-700 dark:text-gray-200">Área</label>
-                        <select name="area" required
-                                class="w-full bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            <option value="" disabled selected hidden>Selecciona un área</option>
-                            <optgroup label="Área administrativa">
-                                <option>Diseño</option>
-                                <option>Recursos Humanos</option>
-                                <option>Ecommerce</option>
-                                <option>Contabilidad</option>
-                                <option>Administración</option>
-                                <option>Crédito y cobranza</option>
-                                <option>Compras</option>
-                            </optgroup>
-                            <optgroup label="Sucursales">
-                                <option>Makita</option>
-                                <option>Milwaukee</option>
-                                <option>California</option>
-                                <option>Matriz</option>
-                                <option>Multimarca</option>    
-                                <option>Taller California</option>
-                            </optgroup>
-                            <optgroup label="Almacenes">
-                                <option>Almacén</option>
-                                <option>Bodega</option>
-                            </optgroup>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-gray-700 dark:text-gray-200">Asunto</label>
-                        <select name="asunto" required
-                                class="w-full bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            <option value="" disabled selected hidden>Selecciona un asunto</option>
-                            <option label="INNOVASMART">INNOVASMART</option>
-                            <option label="INNOVAD-IA">INNOVAD-IA</option>
-                            <option>Internet y telefonía</option>
-                            <option>Reportes</option>
-                            <option>Hardware</option>
-                            <option>Software</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-gray-700 dark:text-gray-200">Descripción</label>
-                        <textarea name="descripcion" placeholder="Detalles del ticket..." rows="3" required
-                                  class="w-full bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
-                    </div>
-                    <div class="mt-6 flex justify-end space-x-2">
-                        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow">Guardar</button>
-                        <button type="button" data-close class="bg-gray-400 hover:bg-gray-500 text-white px-4 py-2 rounded-lg shadow">Cancelar</button>
-                    </div>
-                </form>
-            </div>
-        </div>
+                {{-- Modal Crear Ticket --}}
+                <div id="modal-create" class="fixed inset-0 z-50 hidden" aria-hidden="true">
+                    <div class="absolute inset-0 bg-black/50 backdrop-blur-sm transition-opacity"></div>
+                    
+                    <div class="relative mx-auto p-4 w-full max-w-md top-1/2 -translate-y-1/2">
+                        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 sm:p-8">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="text-xl font-bold text-gray-900 dark:text-white">
+                                    Crear Nuevo Ticket
+                                </h3>
+                                <button type="button" data-close class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                    </svg>
+                                </button>
+                            </div>
 
-        <!-- Modal Ver Ticket -->
-        <div id="modal-view" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50" style="display:none;">
-            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg w-11/12 max-w-md p-6 relative">
-                <button data-close class="absolute top-3 right-3 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 text-2xl leading-none">&times;</button>
-                <h3 class="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-4">Ticket #<span id="view-id"></span></h3>
-                <div class="space-y-4">
-                    <div>
-                        <h4 class="font-medium text-gray-700 dark:text-gray-200">Área</h4>
-                        <p id="view-area" class="text-gray-800 dark:text-gray-200"></p>
-                    </div>
-                    <div>
-                        <h4 class="font-medium text-gray-700 dark:text-gray-200">Asunto</h4>
-                        <p id="view-asunto" class="text-gray-800 dark:text-gray-200"></p>
-                    </div>
-                    <div>
-                        <h4 class="font-medium text-gray-700 dark:text-gray-200">Descripción</h4>
-                        <p id="view-descripcion" class="text-gray-800 dark:text-gray-200"></p>
-                    </div>
-                    <div class="flex justify-between">
-                        <div>
-                            <h4 class="font-medium text-gray-700 dark:text-gray-200">Estado</h4>
-                            <span id="view-estado" class="inline-block px-2 py-1 text-sm font-semibold rounded-full"></span>
-                        </div>
-                        <div>
-                            <h4 class="font-medium text-gray-700 dark:text-gray-200">Creado</h4>
-                            <p id="view-creado" class="text-gray-800 dark:text-gray-200"></p>
+                            <form method="POST" action="{{ route('soporte.tickets.store') }}" class="space-y-4">
+                                @csrf
+                                <div class="grid gap-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Área</label>
+                                        <select name="area" required class="w-full bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 px-3 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                            <option value="" disabled selected hidden>Selecciona un área</option>
+                                            <optgroup label="Área administrativa">
+                                                <option>Diseño</option>
+                                                <option>Recursos Humanos</option>
+                                                <option>Ecommerce</option>
+                                                <option>Contabilidad</option>
+                                                <option>Administración</option>
+                                                <option>Crédito y cobranza</option>
+                                                <option>Compras</option>
+                                            </optgroup>
+                                            <optgroup label="Sucursales">
+                                                <option>Makita</option>
+                                                <option>Milwaukee</option>
+                                                <option>California</option>
+                                                <option>Matriz</option>
+                                                <option>Multimarca</option>    
+                                                <option>Taller California</option>
+                                            </optgroup>
+                                            <optgroup label="Almacenes">
+                                                <option>Almacén</option>
+                                                <option>Bodega</option>
+                                            </optgroup>
+                                        </select>
+                                    </div>
+
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Asunto</label>
+                                        <select name="asunto" required class="w-full bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 px-3 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                            <option value="" disabled selected hidden>Selecciona un asunto</option>
+                                            <option>INNOVASMART</option>
+                                            <option>INNOVAD-IA</option>
+                                            <option>Internet y telefonía</option>
+                                            <option>Reportes</option>
+                                            <option>Hardware</option>
+                                            <option>Software</option>
+                                        </select>
+                                    </div>
+
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Descripción</label>
+                                        <textarea name="descripcion" rows="3" required class="w-full bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 px-3 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Describe detalladamente tu solicitud..."></textarea>
+                                    </div>
+                                </div>
+
+                                <div class="mt-6 flex justify-end gap-3">
+                                    <button type="button" data-close class="px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors">
+                                        Cancelar
+                                    </button>
+                                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow transition-colors">
+                                        Guardar Ticket
+                                    </button>
+                                </div>
+                            </form>
                         </div>
                     </div>
                 </div>
+
+                {{-- Modal Ver Ticket --}}
+                <div id="modal-view" class="fixed inset-0 z-50 hidden" aria-hidden="true">
+                    <div class="absolute inset-0 bg-black/50 backdrop-blur-sm transition-opacity"></div>
+                    
+                    <div class="relative mx-auto p-4 w-full max-w-md top-1/2 -translate-y-1/2">
+                        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 sm:p-8">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="text-xl font-bold text-gray-900 dark:text-white">
+                                    Ticket #<span id="view-id"></span>
+                                </h3>
+                                <button type="button" data-close class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                    </svg>
+                                </button>
+                            </div>
+
+                            <div class="space-y-4 text-gray-600 dark:text-gray-300">
+                                <div class="grid grid-cols-2 gap-4 border-b pb-4 dark:border-gray-700">
+                                    <div>
+                                        <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Estado</dt>
+                                        <dd id="view-estado" class="mt-1"></dd>
+                                    </div>
+                                    <div>
+                                        <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Creado</dt>
+                                        <dd id="view-creado" class="mt-1 text-gray-900 dark:text-gray-100"></dd>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Área</dt>
+                                    <dd id="view-area" class="mt-1 text-gray-900 dark:text-gray-100"></dd>
+                                </div>
+
+                                <div>
+                                    <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Asunto</dt>
+                                    <dd id="view-asunto" class="mt-1 text-lg font-medium text-gray-900 dark:text-white"></dd>
+                                </div>
+
+                                <div>
+                                    <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Descripción</dt>
+                                    <dd id="view-descripcion" class="mt-1 text-gray-900 dark:text-gray-100 prose dark:prose-invert max-h-64 overflow-y-auto"></dd>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <script>
+                    document.addEventListener('DOMContentLoaded', () => {
+                        const modals = {
+                            create: document.getElementById('modal-create'),
+                            view: document.getElementById('modal-view')
+                        }
+
+                        // Control de modales
+                        const closeModals = () => Object.values(modals).forEach(m => m.classList.add('hidden'))
+                        
+                        document.querySelectorAll('[data-close]').forEach(btn => 
+                            btn.addEventListener('click', closeModals)
+                        )
+
+                        document.getElementById('btn-create')?.addEventListener('click', () => 
+                            modals.create.classList.remove('hidden')
+                        )
+
+                        // Mostrar ticket
+                        document.querySelectorAll('.btn-view').forEach(btn => {
+                            btn.addEventListener('click', () => {
+                                const ticket = JSON.parse(btn.dataset.ticket)
+                                
+                                document.getElementById('view-id').textContent = ticket.id
+                                document.getElementById('view-area').textContent = ticket.area
+                                document.getElementById('view-asunto').textContent = ticket.asunto
+                                document.getElementById('view-descripcion').textContent = ticket.descripcion
+                                
+                                // Estado
+                                const estado = document.getElementById('view-estado')
+                                estado.innerHTML = `
+                                    <span class="px-3 py-1 text-sm rounded-full 
+                                        ${ticket.estado === 'Abierto' ? 'bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100' :
+                                           ticket.estado === 'En Progreso' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-100' :
+                                           'bg-gray-100 text-gray-800 dark:bg-gray-600 dark:text-gray-100'}">
+                                        ${ticket.estado}
+                                    </span>
+                                `
+
+                                // Fecha de creación
+                                const options = { 
+                                    year: 'numeric', 
+                                    month: 'short', 
+                                    day: 'numeric', 
+                                    hour: '2-digit', 
+                                    minute: '2-digit' 
+                                }
+                                document.getElementById('view-creado').textContent = 
+                                    new Date(ticket.created_at).toLocaleDateString('es-ES', options)
+
+                                modals.view.classList.remove('hidden')
+                            })
+                        })
+
+                        // Cerrar al hacer clic fuera
+                        Object.values(modals).forEach(modal => 
+                            modal.addEventListener('click', e => e.target === modal && closeModals())
+                        )
+                    })
+                </script>
+
             </div>
         </div>
     </div>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Mostrar/ocultar modals y llenar datos de 'Ver'
-            const btnCreate = document.getElementById('btn-create');
-            const modalCreate = document.getElementById('modal-create');
-            const modalView = document.getElementById('modal-view');
-            document.querySelectorAll('[data-close]').forEach(btn => btn.addEventListener('click', () => {
-                modalCreate.style.display = 'none';
-                modalView.style.display = 'none';
-            }));
-            btnCreate?.addEventListener('click', () => modalCreate.style.display = 'flex');
-            document.querySelectorAll('.btn-view').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const t = JSON.parse(btn.dataset.ticket);
-                    document.getElementById('view-id').textContent = t.id;
-                    document.getElementById('view-area').textContent = t.area;
-                    document.getElementById('view-asunto').textContent = t.asunto;
-                    document.getElementById('view-descripcion').textContent = t.descripcion;
-                    document.getElementById('view-estado').textContent = t.estado;
-                    document.getElementById('view-estado').className = t.estado==='Abierto'
-                        ? 'inline-block px-2 py-1 text-sm font-semibold rounded-full bg-green-200 text-green-800 dark:bg-green-600 dark:text-green-100'
-                        : 'inline-block px-2 py-1 text-sm font-semibold rounded-full bg-yellow-200 text-yellow-800 dark:bg-yellow-600 dark:text-yellow-100';
-                    document.getElementById('view-creado').textContent = t.created_at || t.creado;
-                    modalView.style.display = 'flex';
-                });
-            });
-        });
-    </script>
 </x-app-layout>
