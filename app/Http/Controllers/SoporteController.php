@@ -63,7 +63,7 @@ class SoporteController extends Controller
 
         $data = $request->validate([
           'estado'     => 'required|in:Abierto,En Progreso,Cerrado',
-          'asignado_a' => 'nullable|in:Alan,Maribel',
+          'asignado_a' => 'nullable|in:Alan,Maribel,Fer',
         ]);
 
         $ticket->update($data);
