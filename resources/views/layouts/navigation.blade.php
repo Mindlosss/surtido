@@ -181,6 +181,14 @@
         </div>
         @endcan 
 
+        @can('ver-soporte')
+        <div class="pt-2 pb-3 space-y-1">
+            <x-responsive-nav-link :href="route('soporte')" :active="request()->routeIs('soporte')">
+                {{ __('SOPORTE') }}
+            </x-responsive-nav-link>
+        </div>
+        @endcan 
+
 
 
 
