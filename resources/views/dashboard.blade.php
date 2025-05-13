@@ -35,13 +35,14 @@
                                 ['name' => 'TALLERES', 'icon' => 'talleres.png', 'route' => '#', 'perm' => 'ver-talleres', 'dev' => true],
                                 ['name' => 'EXHIBICION', 'icon' => 'exhibicion.png', 'route' => '#', 'perm' => 'ver-exhibicion', 'dev' => true],
                                 ['name' => 'INVERSIONES', 'icon' => 'inversiones.png', 'route' => '#', 'perm' => 'ver-inversiones', 'dev' => true],
-                                ['name' => 'COTIZADOR', 'icon' => 'cotizador.png', 'route' => 'cotizador', 'perm' => 'ver-cotizador', 'dev' => false],
+                                ['name' => 'COTIZADOR', 'icon' => 'cotizador.png', 'route' => '#', 'perm' => 'ver-cotizador', 'dev' => true],
                                 ['name' => 'VENTAS', 'icon' => 'ventas.png', 'route' => '#', 'perm' => 'ver-ventas', 'dev' => true],
                                 ['name' => 'SOPORTE', 'icon' => 'soporte.png', 'route' => 'soporte', 'perm' => 'ver-soporte', 'dev' => false],
                                 ['name' => 'ENVÍOS', 'icon' => 'envios.png', 'route' => '#', 'perm' => 'ver-envios', 'dev' => true],
+                                ['name' => 'GASTOS', 'icon' => 'gastos.png', 'route' => '#', 'perm' => 'ver-gastos', 'dev' => true],
                             ];
 
-                            usort($apps, function ($a, $b) {
+                            usort($apps, function ($a, $b) { 
                                 $hasAccessA = isset($a['role']) ? auth()->user()->hasRole($a['role']) :
                                             (isset($a['perm']) ? auth()->user()->can($a['perm']) : true);
                                 $hasAccessB = isset($b['role']) ? auth()->user()->hasRole($b['role']) :

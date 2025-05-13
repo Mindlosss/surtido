@@ -47,6 +47,7 @@
                             <tr>
                                 <th class="px-3 sm:px-4 py-3 text-left text-xs sm:text-sm font-medium text-gray-800 dark:text-gray-200 uppercase">ID</th>
                                 <th class="px-3 sm:px-4 py-3 text-left text-xs sm:text-sm font-medium text-gray-800 dark:text-gray-200 uppercase">Asunto</th>
+                                <th class="hidden sm:table-cell px-4 py-3 text-left text-sm font-medium text-gray-800 dark:text-gray-200 uppercase">Área</th>
                                 <th class="hidden sm:table-cell px-4 py-3 text-left text-sm font-medium text-gray-800 dark:text-gray-200 uppercase">Solicitante</th>
                                 <th class="px-3 sm:px-4 py-3 text-left text-xs sm:text-sm font-medium text-gray-800 dark:text-gray-200 uppercase">Prioridad</th>
                                 <th class="hidden sm:table-cell px-4 py-3 text-left text-sm font-medium text-gray-800 dark:text-gray-200 uppercase">Estado</th>
@@ -62,6 +63,7 @@
                                 <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
                                     <td class="px-3 sm:px-4 py-3 whitespace-nowrap text-sm dark:text-gray-200">{{ $t->id }}</td>
                                     <td class="px-3 sm:px-4 py-3 max-w-[200px] truncate text-sm dark:text-gray-200">{{ $t->asunto }}</td>
+                                    <td class="px-3 sm:px-4 py-3 whitespace-nowrap text-sm dark:text-gray-200">{{ $t->area }}</td>
                                     <td class="hidden sm:table-cell px-4 py-3 text-sm dark:text-gray-200">{{ $t->creador->name }}</td>
                                     <td class="px-3 sm:px-4 py-3 whitespace-nowrap text-sm dark:text-gray-200">
                                         <form method="POST" action="{{ route('soporte.tickets.update', $t) }}">
@@ -245,6 +247,7 @@
                         <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
                             <td class="px-3 sm:px-4 py-3 whitespace-nowrap text-sm dark:text-gray-200">${t.id}</td>
                             <td class="px-3 sm:px-4 py-3 max-w-[200px] truncate text-sm dark:text-gray-200">${t.asunto}</td>
+                            <td class="px-3 sm:px-4 py-3 whitespace-nowrap text-sm dark:text-gray-200">${t.area}</td>
                             <td class="hidden sm:table-cell px-4 py-3 text-sm dark:text-gray-200">${t.creador.name}</td>
                             <td class="px-3 sm:px-4 py-3 whitespace-nowrap text-sm dark:text-gray-200">
                                 <form method="POST" action="/soporte/tickets/${t.id}">
