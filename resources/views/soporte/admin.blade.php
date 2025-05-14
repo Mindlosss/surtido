@@ -317,8 +317,12 @@
                     }
 
                     $(document).ready(() => {
-                        fetchTickets();
-                        setInterval(fetchTickets, 10000);
+                        const intervalId = setInterval(fetchTickets, 10000);
+
+                        $('form').on('submit', e => {
+                            clearInterval(intervalId); 
+                            
+                        });
                     });
                 </script>
 
