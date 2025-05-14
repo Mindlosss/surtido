@@ -39,7 +39,7 @@
                                 ['name' => 'VENTAS', 'icon' => 'ventas.png', 'route' => '#', 'perm' => 'ver-ventas', 'dev' => true],
                                 ['name' => 'SOPORTE', 'icon' => 'soporte.png', 'route' => 'soporte', 'perm' => 'ver-soporte', 'dev' => false],
                                 ['name' => 'ENVÍOS', 'icon' => 'envios.png', 'route' => '#', 'perm' => 'ver-envios', 'dev' => true],
-                                ['name' => 'GASTOS', 'icon' => 'gastos.png', 'route' => '#', 'perm' => 'ver-gastos', 'dev' => true],
+                                ['name' => 'GASTOS', 'icon' => 'gastos.png', 'route' => 'gastos-php', 'perm' => 'ver-gastos', 'dev' => false],
                             ];
 
                             usort($apps, function ($a, $b) { 

@@ -12,6 +12,7 @@ use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\CotizadorController;
 use App\Http\Controllers\ComparadorController;
 use App\Http\Controllers\SoporteController;
+use App\Http\Controllers\GastosController;
 
 // RUTA PRINCIPAL
 Route::middleware(['auth'])->group(function () {
@@ -100,6 +101,11 @@ Route::middleware(['auth','can:ver-soporte'])->group(function(){
     Route::post('/soporte/tickets', [SoporteController::class,'store'])->name('soporte.tickets.store');
     Route::put('/soporte/tickets/{ticket}', [SoporteController::class,'update'])->name('soporte.tickets.update');
     Route::get('/soporte/fetch', [SoporteController::class,'fetch'])->name('soporte.fetch');
+});
+
+//RUTAS GASTOS
+Route::middleware(['auth', 'can:ver-gastos'])->group(function () {
+    Route::get('/gastos-php', [GastosController::class, 'index'])->name('gastos-php');
 });
 
 // RUTAS DE PERFIL

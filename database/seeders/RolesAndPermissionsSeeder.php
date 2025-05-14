@@ -33,6 +33,7 @@ class RolesAndPermissionsSeeder extends Seeder
         // Permission::create(['name' => 'ver-envios']);
         // Permission::create(['name' => 'ver-comparador']);
         // Permission::create(['name' => 'ver-alerta-precios']);
+        Permission::create(['name' => 'ver-gastos']);
 
     
         //CREACIÖN DE ROLES
