@@ -1,21 +1,16 @@
 <?php
-$page_title = "Listado de Gastos"; // Título específico para esta página
-require_once 'layout_header.php'; // Incluir el nuevo header
+$page_title = "Listado de Gastos";
+require_once 'layout_header.php';
+require_once 'config/db.php'; 
 
-// Habilitar reporte de errores para depuración (puedes comentar estas líneas en producción)
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-// Incluir el archivo de conexión a la BD
-require_once 'config/db.php'; 
-
-// La lógica PHP para obtener los gastos de la BD
 $gastos = [];
 $error_message = '';
-$success_message = ''; // Para mensajes de éxito después de una acción (ej. eliminar, editar)
+$success_message = '';
 
-// Verificar si hay un mensaje de alguna acción previa
 if (isset($_GET['mensaje_exito'])) {
     $success_message = htmlspecialchars($_GET['mensaje_exito']);
 }
@@ -23,23 +18,49 @@ if (isset($_GET['mensaje_error'])) {
     $error_message = htmlspecialchars($_GET['mensaje_error']);
 }
 
+// --- Recoger parámetros de filtro (GET) ---
+$filtro_fecha_desde = $_GET['fecha_desde'] ?? '';
+$filtro_fecha_hasta = $_GET['fecha_hasta'] ?? '';
+$filtro_id_area_uso = filter_input(INPUT_GET, 'id_area_uso', FILTER_VALIDATE_INT);
+$filtro_id_plataforma = filter_input(INPUT_GET, 'id_plataforma_compra', FILTER_VALIDATE_INT);
+
+// --- Lógica para construir la cláusula WHERE ---
+$where_clauses = [];
+$params = [];
+
+if (!empty($filtro_fecha_desde)) {
+    $where_clauses[] = "g.fecha_compra >= :fecha_desde";
+    $params[':fecha_desde'] = $filtro_fecha_desde;
+}
+if (!empty($filtro_fecha_hasta)) {
+    $where_clauses[] = "g.fecha_compra <= :fecha_hasta";
+    $params[':fecha_hasta'] = $filtro_fecha_hasta;
+}
+if ($filtro_id_area_uso) {
+    $where_clauses[] = "g.id_area_uso = :id_area_uso";
+    $params[':id_area_uso'] = $filtro_id_area_uso;
+}
+if ($filtro_id_plataforma) {
+    $where_clauses[] = "g.id_plataforma_compra = :id_plataforma_compra";
+    $params[':id_plataforma_compra'] = $filtro_id_plataforma;
+}
+
+$sql_where_condition = "";
+if (!empty($where_clauses)) {
+    $sql_where_condition = "WHERE " . implode(" AND ", $where_clauses);
+}
+
 try {
     $pdo = getPDOConnection(); 
 
     $sql = "SELECT 
-                g.id_gasto, 
-                g.fecha_compra, 
+                g.id_gasto, g.fecha_compra, 
                 tg.nombre_tipo AS tipo_gasto, 
                 au.nombre_area AS area_uso, 
-                g.descripcion, 
-                g.total_gasto, 
-                g.folio_factura, 
-                g.tiene_factura, 
-                g.tiene_xml,
-                g.nombre_archivo_doc, 
-                g.ruta_archivo_doc,   
-                g.nombre_archivo_xml, 
-                g.ruta_archivo_xml,   
+                g.descripcion, g.total_gasto, g.folio_factura, 
+                g.tiene_factura, g.tiene_xml,
+                g.nombre_archivo_doc, g.ruta_archivo_doc,   
+                g.nombre_archivo_xml, g.ruta_archivo_xml,   
                 IFNULL(t.nombre_tarjeta, g.tarjeta_otro) AS tarjeta,
                 IFNULL(pc.nombre_plataforma, g.plataforma_otro) AS plataforma
             FROM gastos g
@@ -47,9 +68,11 @@ try {
             LEFT JOIN areas_uso au ON g.id_area_uso = au.id_area_uso
             LEFT JOIN tarjetas t ON g.id_tarjeta = t.id_tarjeta
             LEFT JOIN plataformas_compra pc ON g.id_plataforma_compra = pc.id_plataforma_compra
+            {$sql_where_condition}  -- Aplicar filtros aquí
             ORDER BY g.fecha_compra DESC, g.id_gasto DESC";
 
-    $stmt = $pdo->query($sql);
+    $stmt = $pdo->prepare($sql); // Preparar la consulta
+    $stmt->execute($params);      // Ejecutar con los parámetros de filtro
     $gastos = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 } catch (PDOException $e) {
@@ -61,7 +84,6 @@ try {
         $pdo = null;
     }
 }
-
 ?>
 
 <div class="container mx-auto px-0 md:px-4 py-0">
@@ -73,6 +95,34 @@ try {
         <div class="mensaje mensaje-error my-4"><?php echo $error_message; ?></div>
     <?php endif; ?>
 
+    <form action="listar_gastos.php" method="GET" class="filtros-container mb-6">
+        <div class="filtro-grupo">
+            <label for="fecha_desde">Desde:</label>
+            <input type="date" id="fecha_desde" name="fecha_desde" value="<?php echo htmlspecialchars($filtro_fecha_desde); ?>">
+        </div>
+        <div class="filtro-grupo">
+            <label for="fecha_hasta">Hasta:</label>
+            <input type="date" id="fecha_hasta" name="fecha_hasta" value="<?php echo htmlspecialchars($filtro_fecha_hasta); ?>">
+        </div>
+        <div class="filtro-grupo">
+            <label for="id_area_uso">Área de Uso:</label>
+            <select id="id_area_uso" name="id_area_uso">
+                <option value="">Todas</option>
+                </select>
+        </div>
+        <div class="filtro-grupo">
+            <label for="id_plataforma_compra">Plataforma:</label>
+            <select id="id_plataforma_compra" name="id_plataforma_compra">
+                <option value="">Todas</option>
+                </select>
+        </div>
+        <div class="filtro-grupo">
+            <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold">Aplicar Filtros</button>
+        </div>
+         <div class="filtro-grupo">
+            <a href="listar_gastos.php" class="w-full text-center bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-md shadow-sm transition duration-150 ease-in-out h-11 leading-7">Limpiar Filtros</a>
+        </div>
+    </form>
     <div class="my-4"> 
         <a href="captura_gasto.php" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition duration-150 ease-in-out inline-flex items-center">
             <i class="fas fa-plus mr-2"></i>Registrar Nuevo Gasto
@@ -80,7 +130,7 @@ try {
     </div>
 
     <?php if (empty($gastos) && empty($error_message) && empty($success_message)): ?>
-        <div class="mensaje mensaje-info">No hay gastos registrados todavía.</div>
+        <div class="mensaje mensaje-info">No hay gastos que coincidan con los filtros aplicados o no hay gastos registrados.</div>
     <?php elseif (!empty($gastos)): ?>
         <div class="bg-white shadow-md rounded-lg overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200">
@@ -164,6 +214,60 @@ try {
     <?php endif; ?>
 </div>
 
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Poblar los selects de filtro y seleccionar valores actuales si existen
+    const filtroAreaUsoSelect = document.getElementById('id_area_uso');
+    const filtroPlataformaSelect = document.getElementById('id_plataforma_compra');
+    
+    // Valores actuales de los filtros (si la página se recargó con ellos)
+    const currentArea = <?php echo json_encode($filtro_id_area_uso); ?>;
+    const currentPlataforma = <?php echo json_encode($filtro_id_plataforma); ?>;
+
+    fetch('obtener_catalogos.php')
+        .then(response => response.ok ? response.json() : Promise.reject('Error al cargar catálogos'))
+        .then(data => {
+            if (data.success && data.data) {
+                if (filtroAreaUsoSelect && data.data.areas_uso) {
+                    poblarSelectFiltro(filtroAreaUsoSelect, data.data.areas_uso, 'id_area_uso', 'nombre_area', 'Todas', currentArea);
+                }
+                if (filtroPlataformaSelect && data.data.plataformas_compra) {
+                    poblarSelectFiltro(filtroPlataformaSelect, data.data.plataformas_compra, 'id_plataforma_compra', 'nombre_plataforma', 'Todas', currentPlataforma);
+                }
+            } else {
+                console.error('Error en datos de catálogos para filtros:', data.message);
+            }
+        })
+        .catch(error => console.error('Error en fetch para catálogos de filtro:', error));
+});
+
+function poblarSelectFiltro(selectElement, items, valueField, textField, placeholderText, currentValue) {
+    if (!selectElement) return;
+    
+    // Guardar el placeholder si ya existe o crearlo
+    let placeholderOpt = selectElement.querySelector('option[value=""]');
+    if (!placeholderOpt) {
+        placeholderOpt = document.createElement('option');
+        placeholderOpt.value = "";
+        placeholderOpt.textContent = placeholderText;
+    }
+    selectElement.innerHTML = ''; // Limpiar
+    selectElement.appendChild(placeholderOpt); // Re-añadir placeholder
+
+    if (items && items.length > 0) {
+        items.forEach(item => {
+            const option = document.createElement('option');
+            option.value = item[valueField];
+            option.textContent = item[textField];
+            if (currentValue && item[valueField] == currentValue) {
+                option.selected = true;
+            }
+            selectElement.appendChild(option);
+        });
+    }
+}
+</script>
+
 <?php
-require_once 'layout_footer.php'; // Incluir el nuevo footer
+require_once 'layout_footer.php';
 ?>
