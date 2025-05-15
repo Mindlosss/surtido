@@ -35,6 +35,7 @@ class CotizadorController extends Controller
                     'MARCA' => $producto->MARCA,
                     'ESTATUS' => $producto->ESTATUS,
                     'CLASIF' => $producto->CLASIF,
+                    'CATEGORIA'   => trim($producto->CAT),
                     'RUTA_IMAGEN' => $producto->RUTA_IMAGEN,
                     'ALTO' => $producto->ALTO,
                     'ANCHO' => $producto->ANCHO,
