@@ -149,10 +149,10 @@ $active_page = basename($_SERVER['PHP_SELF']);
                     </h1>
                     <div class="flex items-center space-x-4">
                         <div class="relative">
-                            <button class="flex items-center space-x-2 focus:outline-none">
-                                <img src="https://placehold.co/40x40/E2E8F0/4A5568?text=U" alt="[Avatar de Usuario]" class="w-9 h-9 rounded-full border-2 border-slate-300 shadow-sm">
-                                <span class="text-slate-700 hidden sm:block font-medium">Usuario</span>
-                            </button>
+                        <a href="/" 
+                            class="flex items-center justify-center py-2 px-4 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg transition">
+                            Salir
+                        </a>
                         </div>
                     </div>
                 </div>
